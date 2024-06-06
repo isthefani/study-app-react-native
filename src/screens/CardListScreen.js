@@ -6,54 +6,67 @@ const CardListScreen = ({ navigation }) => {
 
     const { cards, deleteCard } = useContext(StudyCardsContext)
 
-    // Filtrar os cards por status
+    //Filtrar os cards por status
     const inProgressCards = cards.filter(card => card.status === 'in_progress')
     const concludedCards = cards.filter(card => card.status === 'done')
     const backlogCards = cards.filter(card => card.status === 'backlog')
 
-    const renderCard = ({ intem }) => (
+    const today = new Date()
+    const dueSoonCards = cards.filter(card => {
+        const dueDate = new Date(card.dueDate)
+        const diffInDays = (dueDate - today) / (1000 * 60 * 60 * 24)
+        return diffInDays >= 0 && diffInDays <= 15
+    })
+
+    const renderCard = ({ item }) => (
       <View style={styles.card}>
         <Text style={styles.cardTitle}>{item.title}</Text>
         <Text>Status: {item.status}</Text>
+        <Text>Data/Hora de Término: {new Date(item.dueDate).toLocaleString()}</Text>
         <View>
-          <Button title='Editar' onPress={() => navigation.navigate('CardEdit', {id: item.id})}/>
-          <Button title='Deletar' onPress={() => deleteCard(item.id)} color="#ff6347"/>
+          <Button title='Editar' onPress={() => navigation.navigate('CardEdit', { id: item.id })} />
+          <Button title='Deletar' onPress={() => deleteCard(item.id)} color="#ff6347" />
         </View>
-      </View>
+
+      </View> 
     )
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Em progresso</Text>
+      <TouchableOpacity style={styles.dueSoonButton} onPress={() => navigation.navigate('TasksDueSoon')}>
+        <Text style={styles.dueSoonButtonText}>Tasks a Vencer: {dueSoonCards.length}</Text>
+      </TouchableOpacity>
+      <Text style={styles.sectionTitle}>Em Progresso</Text>
       <FlatList 
         data={inProgressCards}
-        keyExtractor={item => item.id.toString}
+        keyExtractor={item => item.id.toString()}
         renderItem={renderCard}
         horizontal={true}
         showsHorizontalScrollIndicator={false}
       />
-      <View syles={styles.divider}/>
+      <View style={styles.divider} />
       <Text style={styles.sectionTitle}>Concluído</Text>
       <FlatList 
         data={concludedCards}
-        keyExtractor={item => item.id.toString}
+        keyExtractor={item => item.id.toString()}
         renderItem={renderCard}
         horizontal={true}
         showsHorizontalScrollIndicator={false}
       />
-      <View syles={styles.divider}/>
+      <View style={styles.divider} />
       <Text style={styles.sectionTitle}>Backlog</Text>
       <FlatList 
         data={backlogCards}
-        keyExtractor={item => item.id.toString}
+        keyExtractor={item => item.id.toString()}
         renderItem={renderCard}
         horizontal={true}
         showsHorizontalScrollIndicator={false}
       />
 
       <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('CardEdit')}>
-        <Text style={styles.addButtonText}>+ ADICIONAR NOVO CARD</Text>
+        <Text style={styles.addButtonText}>+ Adicionar Novo Card</Text>
       </TouchableOpacity>
+      
     </View>
   )
 }
@@ -63,6 +76,32 @@ const styles = StyleSheet.create({
       flex: 1,
       padding: 10,
       backgroundColor: '#f9f9f9',
+  },
+  dueSoonButton: {
+      backgroundColor: '#ff4500',
+      padding: 10,
+      borderRadius: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 20,
+  },
+  dueSoonButtonText: {
+      color: '#ffffff',
+      fontSize: 16,
+      fontWeight: 'bold',
+  },
+  suggestButton: {
+      backgroundColor: '#4682b4',
+      padding: 10,
+      borderRadius: 10,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 20,
+  },
+  suggestButtonText: {
+      color: '#ffffff',
+      fontSize: 16,
+      fontWeight: 'bold',
   },
   card: {
       backgroundColor: '#ffffff',

@@ -15,8 +15,8 @@ export const StudyCardsProvider = ({ children }) => {
         if (storedCards) setCards(JSON.parse(storedCards))
     }
 
-    const addCard = async ( ) => {
-        const newCards = [...cards, {...cards, id: Date.now()}]
+    const addCard = async (card) => {
+        const newCards = [...cards, {...card, id: Date.now()}]
         setCards(newCards)
         await AsyncStorage.setItem('cards', JSON.stringify(newCards))
     }
